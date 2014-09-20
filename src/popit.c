@@ -1,40 +1,26 @@
+#include <stdlib.h>
+#include <time.h>
 #include <pebble.h>
+#include "ui.h"
+#include "action.h"
 
-static void init(Window **main_window);
-static void deinit(Window *win);
-static void onload(Window *win);
-static void onunload(Window *win);
+static action_gen gen = { 0 };
+
 extern int main();
+static void tick(void *should_be_null);
 
 int main() {
-  Window *main_window;
-  init(&main_window);
+  srand(time(NULL));
+  ui_init();
+  gen = action_gen_new();
+  tick(NULL);
   app_event_loop();
-  deinit(main_window);
+  ui_quit();
 
   return 0;
 }
 
-void init(Window **main_window) {
-  *main_window = window_create();
-
-  WindowHandlers handlers = {
-    .load = onload,
-    .unload = onunload
-  };
-  window_set_window_handlers(*main_window, handlers);
-
-  window_stack_push(*main_window, true);
-}
-
-void onload(Window *win) {
-  // pass
-}
-
-void onunload(Window *win) {
-  // pass
-}
-
-void deinit(Window *win) {
-  window_destroy(win);
+void tick(void *should_be_null) {
+  action_cmd cmd = action_gen_next(&gen);
+  action_exec(&cmd, tick, NULL);
 }
