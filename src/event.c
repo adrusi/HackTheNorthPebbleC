@@ -49,6 +49,7 @@ void click_config_provider(void *data) {
 }
 
 void onback(ClickRecognizerRef recognizer, void *data) {
+  app_log(APP_LOG_LEVEL_DEBUG, __FILE__, __LINE__, "back");
   for (int i = 0; i < MAX_LISTENERS; i++) {
     if (!listeners[i].flag) continue;
     if (listeners[i].type != EVENT_BTN_BACK) continue;
@@ -56,6 +57,7 @@ void onback(ClickRecognizerRef recognizer, void *data) {
   }
 }
 void onup(ClickRecognizerRef recognizer, void *data) {
+  app_log(APP_LOG_LEVEL_DEBUG, __FILE__, __LINE__, "up");
   for (int i = 0; i < MAX_LISTENERS; i++) {
     if (!listeners[i].flag) continue;
     if (listeners[i].type != EVENT_BTN_TOP) continue;
@@ -63,6 +65,7 @@ void onup(ClickRecognizerRef recognizer, void *data) {
   }
 }
 void onselect(ClickRecognizerRef recognizer, void *data) {
+  app_log(APP_LOG_LEVEL_DEBUG, __FILE__, __LINE__, "mid");
   for (int i = 0; i < MAX_LISTENERS; i++) {
     if (!listeners[i].flag) continue;
     if (listeners[i].type != EVENT_BTN_MID) continue;
@@ -70,6 +73,7 @@ void onselect(ClickRecognizerRef recognizer, void *data) {
   }
 }
 void ondown(ClickRecognizerRef recognizer, void *data) {
+  app_log(APP_LOG_LEVEL_DEBUG, __FILE__, __LINE__, "down");
   for (int i = 0; i < MAX_LISTENERS; i++) {
     if (!listeners[i].flag) continue;
     if (listeners[i].type != EVENT_BTN_BOT) continue;

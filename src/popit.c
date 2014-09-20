@@ -3,6 +3,7 @@
 #include <pebble.h>
 #include "ui.h"
 #include "action.h"
+#include "event.h"
 
 static action_gen gen = { 0 };
 
@@ -13,6 +14,7 @@ static void redraw_loop(void *data);
 int main() {
   srand(time(NULL));
   ui_init();
+  event_init();
   redraw_loop(NULL);
   gen = action_gen_new();
   tick(NULL);

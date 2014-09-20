@@ -17,6 +17,7 @@ static void action_exec_fail_callback(void *data);
 static void correct_input(void *data);
 static void incorrect_input(void *data);
 static void fail_msg(void (*callback)(void *data), void *data);
+static void restore_background_color(void *useless);
 static event_type action2event(action_type action);
 
 event_type action2event(action_type action) {
@@ -47,13 +48,13 @@ action_cmd action_gen_next(action_gen *gen) {
   gen->num_actions++;
   action_type type = action_types[rand() % NUM_ACTIONS];
   switch (type) {
-    case ACTION_TWIST: return (action_cmd) { "Twist It!", type, 2000 };
-    case ACTION_SLAP: return (action_cmd) { "Slap It!", type, 2000 };
-    case ACTION_BTN_TOP: return (action_cmd) { "Up It!", type, 2000 };
-    case ACTION_BTN_MID: return (action_cmd) { "Press It!", type, 2000 };
-    case ACTION_BTN_BOT: return (action_cmd) { "Down It!", type, 2000 };
-    case ACTION_BTN_BACK: return (action_cmd) { "Left It!", type, 2000 };
-    case ACTION_REST: return (action_cmd) { "STOP!", type, 4000 };
+    case ACTION_TWIST: return (action_cmd) { "Twist!", type, 2000 };
+    case ACTION_SLAP: return (action_cmd) { "Slap!", type, 2000 };
+    case ACTION_BTN_TOP: return (action_cmd) { "Up!", type, 2000 };
+    case ACTION_BTN_MID: return (action_cmd) { "Select!", type, 2000 };
+    case ACTION_BTN_BOT: return (action_cmd) { "Down!", type, 2000 };
+    case ACTION_BTN_BACK: return (action_cmd) { "Back!", type, 2000 };
+    case ACTION_REST: return (action_cmd) { "STOP!", type, 3000 };
   }
   return (action_cmd) { "STOP!", ACTION_REST, 0 };
 }
@@ -80,7 +81,6 @@ void action_exec(
   layer_add_child(
       window_get_root_layer(ui_main_window),
       raw_layer);
-  app_log(APP_LOG_LEVEL_DEBUG, __FILE__, __LINE__, "action_exec");
 
   action_exec_data *callback_data = malloc(sizeof (action_exec_data));
   callback_data->callback = callback;
@@ -114,6 +114,7 @@ void action_exec(
         callback_data);
 
     for (int i = 0; i < EVENT_TYPE_CNT; i++) {
+      if (action->type == ACTION_BTN_TOP, 
       callback_data->evt[i] = event_register(
           event_types[i],
           event_types[i] == action2event(action->type)
@@ -125,6 +126,7 @@ void action_exec(
 }
 
 void incorrect_input(void *data) {
+  app_log(APP_LOG_LEVEL_DEBUG, __FILE__, __LINE__, "incorrect");
   action_exec_data exec_data = *((action_exec_data *) data);
   free(data);
 
@@ -140,6 +142,7 @@ void incorrect_input(void *data) {
 }
 
 void correct_input(void *data) {
+  app_log(APP_LOG_LEVEL_DEBUG, __FILE__, __LINE__, "correct");
   action_exec_data exec_data = *((action_exec_data *) data);
   free(data);
 
@@ -151,7 +154,14 @@ void correct_input(void *data) {
   layer_remove_from_parent(text_layer_get_layer(exec_data.msg_layer));
   text_layer_destroy(exec_data.msg_layer);
   
+  window_set_background_color(ui_main_window, GColorBlack);
+  app_timer_register(200, restore_background_color, NULL);
+  
   exec_data.callback(exec_data.data);
+}
+
+void restore_background_color(void *useless) {
+  window_set_background_color(ui_main_window, GColorWhite);
 }
 
 void action_exec_fail_timeout_callback(void *data) {
